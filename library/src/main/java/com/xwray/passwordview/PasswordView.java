@@ -62,10 +62,12 @@ public class PasswordView extends EditText {
             }
         }
 
-        // Make sure to mutate so that if there are multiple password fields, they can have
-        // different visibilities.
-        eye = ContextCompat.getDrawable(getContext(), R.drawable.ic_eye).mutate();
-        eyeWithStrike = ContextCompat.getDrawable(getContext(), R.drawable.ic_eye_strike).mutate();
+        TypedValue ta = new TypedValue();
+        getContext().getTheme().resolveAttribute(android.R.attr.textColorPrimary, ta, true);
+        int color = ContextCompat.getColor(getContext(), ta.resourceId);
+
+        eye = getTintedDrawable(R.drawable.ic_eye, color);
+        eyeWithStrike = getTintedDrawable(R.drawable.ic_eye_strike, color);
         eyeWithStrike.setAlpha(VISIBILITY_ENABLED);
         setup();
     }
@@ -76,6 +78,15 @@ public class PasswordView extends EditText {
         Drawable[] drawables = getCompoundDrawables();
         setCompoundDrawablesWithIntrinsicBounds(drawables[0], drawables[1], drawable, drawables[3]);
         eye.setAlpha(visible && !useStrikeThrough ? VISIBILITY_ENABLED : VISIBLITY_DISABLED);
+    }
+    
+    private Drawable getTintedDrawable(@DrawableRes int resId, @ColorInt int color) {
+        // Make sure to mutate so that if there are multiple password fields, they can have
+        // different visibilities.
+        Drawable drawable = ContextCompat.getDrawable(getContext(), resId);
+        drawable = DrawableCompat.wrap(drawable);
+        DrawableCompat.setTint(drawable, color);
+        return drawable;
     }
 
     @Override public boolean onTouchEvent(MotionEvent event) {
